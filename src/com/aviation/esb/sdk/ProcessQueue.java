@@ -24,6 +24,7 @@ public class ProcessQueue {
 	 }
 	 
 	 public void Clear(){
-		 desk.clear();
+		 if(desk.size()>5000)
+			 desk.clear();
 	 }
 }
