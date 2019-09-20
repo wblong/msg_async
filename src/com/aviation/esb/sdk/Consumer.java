@@ -18,6 +18,9 @@ public class Consumer implements Runnable{
 	private Connection 			_connection;
 	private String 				_topicName;
 	private Log  				_logger;
+	private long 				_start;
+	private long				_end;
+	private long				_count;
 	
     public Consumer(ProcessQueue workDesk,Session session,MessageProducer producer,
     		Connection connection,String topicName ,Log logger) {
@@ -28,21 +31,33 @@ public class Consumer implements Runnable{
         this._connection=connection;
         this._topicName=topicName;
         this._logger=logger;
+        _start=_end=System.currentTimeMillis( );
+        _count=0;
     }
 
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
+		long diff=_end-_start;
 		try {
             for (;;) {
+              
               EsbMessage msg=  _workDesk.useDish();
               try{
             	  TextMessage textMessage = _session.createTextMessage(msg.getMessageBody());
             	  _producer.send(textMessage);
             	  _session.commit();
-            	  if(_workDesk.Count()>5000)
-            		  _workDesk.Clear();
-            	  _logger.info("the current length of workqueue is "+ _workDesk.Count());
+            	  _count++;
+            	  _end=System.currentTimeMillis( );
+            	  diff=_end-_start;
+            	  if(diff>=1000*60){
+            		  _logger.info("process data per minute "+ _count +"; " + 
+            				  "the current length of queue is " + _workDesk.Count() );
+            		  _start=_end;
+            		  _count=0;
+            	  }
+            	  _workDesk.Clear();
+            	  
               }catch(javax.jms.IllegalStateException ex){
             	  
             	  _session = _connection.createSession(true, Session.AUTO_ACKNOWLEDGE);
