@@ -39,6 +39,9 @@ public class Consumer implements Runnable{
               try{
             	  TextMessage textMessage = _session.createTextMessage(msg.getMessageBody());
             	  _producer.send(textMessage);
+            	  _session.commit();
+            	  if(_workDesk.Count()>5000)
+            		  _workDesk.Clear();
             	  _logger.info("the current length of workqueue is "+ _workDesk.Count());
               }catch(javax.jms.IllegalStateException ex){
             	  

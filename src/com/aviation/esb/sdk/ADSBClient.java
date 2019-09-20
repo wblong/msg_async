@@ -54,7 +54,7 @@ public class ADSBClient implements IBussReceiver {
 	public static void main(String[] args) {
 		init();
 		ExecutorService service = Executors.newCachedThreadPool();
-		for(int i=0;i<5;i++){
+		for(int i=0;i<20;i++){
 			
 			service.submit(new Consumer(flightqueue,session_flight,producer_flight,
 					connection_flight,mqAircraftName,logger));
@@ -98,23 +98,18 @@ public class ADSBClient implements IBussReceiver {
 
 	@Override
 	public void receiveData(EsbMessage esbMessage) {
-		//pool.execute(
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					// TODO Auto-generated method stub
-					String topic = esbMessage.getHeadersMap().get("Svc_TopicName");
-					
-					if (topic.equals("AirportToptic/IHPS_HKQWZBCSJFW")) {
-						flightqueue.washDish(esbMessage);
-					}else if (topic.equals("AirportToptic/IHPS_CLWZBCSJFW")) {
-						vehiclequeue.washDish(esbMessage);
-					}
-				}catch(InterruptedException e){
-					logger.error(e.toString());
-				}
+		//pool.execute
+		try {
+			// TODO Auto-generated method stub
+			String topic = esbMessage.getHeadersMap().get("Svc_TopicName");
+			
+			if (topic.equals("AirportToptic/IHPS_HKQWZBCSJFW")) {
+				flightqueue.washDish(esbMessage);
+			}else if (topic.equals("AirportToptic/IHPS_CLWZBCSJFW")) {
+				vehiclequeue.washDish(esbMessage);
 			}
-		}).start();
+		}catch(InterruptedException e){
+			logger.error(e.toString());
+		}
 	}
 }

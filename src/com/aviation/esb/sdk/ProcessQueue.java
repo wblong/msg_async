@@ -9,7 +9,7 @@ import com.tsystems.aviation.esb.resultModel.EsbMessage;
  */
 public class ProcessQueue {
 	
-	 BlockingQueue<EsbMessage> desk = new LinkedBlockingQueue<EsbMessage>(300);
+	 BlockingQueue<EsbMessage> desk = new LinkedBlockingQueue<EsbMessage>(8192);
 	 
 	 public void washDish(EsbMessage msg) throws InterruptedException {
          desk.put(msg);
@@ -21,5 +21,9 @@ public class ProcessQueue {
 	 
 	 public int Count(){
 		 return desk.size() ;
+	 }
+	 
+	 public void Clear(){
+		 desk.clear();
 	 }
 }
